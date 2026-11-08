@@ -1,0 +1,77 @@
+digraph G {
+nodesep=0.5;
+splines=spline;
+rankdir=TB;
+node [shape=Mrecord];
+son000002696FC113C0 [label="{<parent> parent = 0000000000000000 | data = 50 | {<left> left = 000002696FC11270 | <right> right = 000002696FC112A0}}"];
+subgraph level_1 { { rank=same; son000002696FC113C0; } }
+son000002696FC113C0:left:sw -> son000002696FC11270:parent:n [weight=1];
+son000002696FC11270 [label="{<parent> parent = 000002696FC113C0 | data = 20 | {<left> left = 000002696FC11120 | <right> right = 000002696FC11150}}"];
+subgraph level_2 { { rank=same; son000002696FC11270; } }
+son000002696FC11270:left:sw -> son000002696FC11120:parent:n [weight=1];
+son000002696FC11120 [label="{<parent> parent = 000002696FC11270 | data = 10 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_3 { { rank=same; son000002696FC11120; } }
+son000002696FC11270:right:se -> son000002696FC11150:parent:n [weight=1];
+son000002696FC11150 [label="{<parent> parent = 000002696FC11270 | data = 30 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_3 { { rank=same; son000002696FC11150; } }
+son000002696FC113C0:right:se -> son000002696FC112A0:parent:n [weight=1];
+son000002696FC112A0 [label="{<parent> parent = 000002696FC113C0 | data = 60 | {<left> left = 000002696FC113F0 | <right> right = 000002696FC11420}}"];
+subgraph level_2 { { rank=same; son000002696FC112A0; } }
+son000002696FC112A0:left:sw -> son000002696FC113F0:parent:n [weight=1];
+son000002696FC113F0 [label="{<parent> parent = 000002696FC112A0 | data = 55 | {<left> left = 000002696FC11450 | <right> right = 000002696FC11390}}"];
+subgraph level_3 { { rank=same; son000002696FC113F0; } }
+son000002696FC113F0:left:sw -> son000002696FC11450:parent:n [weight=1];
+son000002696FC11450 [label="{<parent> parent = 000002696FC113F0 | data = 50 | {<left> left = 000002696FC112D0 | <right> right = 000002696FC11300}}"];
+subgraph level_4 { { rank=same; son000002696FC11450; } }
+son000002696FC11450:left:sw -> son000002696FC112D0:parent:n [weight=1];
+son000002696FC112D0 [label="{<parent> parent = 000002696FC11450 | data = 20 | {<left> left = 000002696FC11480 | <right> right = 000002696FC11180}}"];
+subgraph level_5 { { rank=same; son000002696FC112D0; } }
+son000002696FC112D0:left:sw -> son000002696FC11480:parent:n [weight=1];
+son000002696FC11480 [label="{<parent> parent = 000002696FC112D0 | data = 10 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_6 { { rank=same; son000002696FC11480; } }
+son000002696FC112D0:right:se -> son000002696FC11180:parent:n [weight=1];
+son000002696FC11180 [label="{<parent> parent = 000002696FC112D0 | data = 30 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_6 { { rank=same; son000002696FC11180; } }
+son000002696FC11450:right:se -> son000002696FC11300:parent:n [weight=1];
+son000002696FC11300 [label="{<parent> parent = 000002696FC11450 | data = 60 | {<left> left = 000002696FC111E0 | <right> right = 000002696FC11210}}"];
+subgraph level_5 { { rank=same; son000002696FC11300; } }
+son000002696FC11300:left:sw -> son000002696FC111E0:parent:n [weight=1];
+son000002696FC111E0 [label="{<parent> parent = 000002696FC11300 | data = 55 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_6 { { rank=same; son000002696FC111E0; } }
+son000002696FC11300:right:se -> son000002696FC11210:parent:n [weight=1];
+son000002696FC11210 [label="{<parent> parent = 000002696FC11300 | data = 120 | {<left> left = 000002696FC11360 | <right> right = 0000000000000000}}"];
+subgraph level_6 { { rank=same; son000002696FC11210; } }
+son000002696FC11210:left:sw -> son000002696FC11360:parent:n [weight=1];
+son000002696FC11360 [label="{<parent> parent = 000002696FC11210 | data = 150 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_7 { { rank=same; son000002696FC11360; } }
+son000002696FC113F0:right:se -> son000002696FC11390:parent:n [weight=1];
+son000002696FC11390 [label="{<parent> parent = 000002696FC113F0 | data = 50 | {<left> left = 000002696FC11240 | <right> right = 000002696FC13870}}"];
+subgraph level_4 { { rank=same; son000002696FC11390; } }
+son000002696FC11390:left:sw -> son000002696FC11240:parent:n [weight=1];
+son000002696FC11240 [label="{<parent> parent = 000002696FC11390 | data = 20 | {<left> left = 000002696FC11330 | <right> right = 000002696FC13750}}"];
+subgraph level_5 { { rank=same; son000002696FC11240; } }
+son000002696FC11240:left:sw -> son000002696FC11330:parent:n [weight=1];
+son000002696FC11330 [label="{<parent> parent = 000002696FC11240 | data = 10 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_6 { { rank=same; son000002696FC11330; } }
+son000002696FC11240:right:se -> son000002696FC13750:parent:n [weight=1];
+son000002696FC13750 [label="{<parent> parent = 000002696FC11240 | data = 30 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_6 { { rank=same; son000002696FC13750; } }
+son000002696FC11390:right:se -> son000002696FC13870:parent:n [weight=1];
+son000002696FC13870 [label="{<parent> parent = 000002696FC11390 | data = 60 | {<left> left = 000002696FC13450 | <right> right = 000002696FC138A0}}"];
+subgraph level_5 { { rank=same; son000002696FC13870; } }
+son000002696FC13870:left:sw -> son000002696FC13450:parent:n [weight=1];
+son000002696FC13450 [label="{<parent> parent = 000002696FC13870 | data = 55 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_6 { { rank=same; son000002696FC13450; } }
+son000002696FC13870:right:se -> son000002696FC138A0:parent:n [weight=1];
+son000002696FC138A0 [label="{<parent> parent = 000002696FC13870 | data = 120 | {<left> left = 000002696FC135D0 | <right> right = 0000000000000000}}"];
+subgraph level_6 { { rank=same; son000002696FC138A0; } }
+son000002696FC138A0:left:sw -> son000002696FC135D0:parent:n [weight=1];
+son000002696FC135D0 [label="{<parent> parent = 000002696FC138A0 | data = 150 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_7 { { rank=same; son000002696FC135D0; } }
+son000002696FC112A0:right:se -> son000002696FC11420:parent:n [weight=1];
+son000002696FC11420 [label="{<parent> parent = 000002696FC112A0 | data = 120 | {<left> left = 000002696FC111B0 | <right> right = 0000000000000000}}"];
+subgraph level_3 { { rank=same; son000002696FC11420; } }
+son000002696FC11420:left:sw -> son000002696FC111B0:parent:n [weight=1];
+son000002696FC111B0 [label="{<parent> parent = 000002696FC11420 | data = 150 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
+subgraph level_4 { { rank=same; son000002696FC111B0; } }
+}
