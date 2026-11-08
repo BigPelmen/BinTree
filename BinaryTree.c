@@ -83,6 +83,13 @@ int NodeLinkLeft(tree_node_t *parent_node, tree_node_t *new_node);
 int NodeLinkRight(tree_node_t *parent_node, tree_node_t *new_node);
 int NodeChangeVal(tree_node_t *node, elem_tree_t new_val);
 void PreorderBranchPrint(FILE *fp, tree_node_t *node);
+void SkipFileSpaces(FILE *fp);
+bool CheckIfNullNode(const char *str);
+read_node_info_t GetNodeVal(FILE *fp, elem_tree_t *arg);
+void SkipCloseBrace(FILE *fp);
+tree_node_t *GetNodesFromFile(FILE *fp, tree_node_t *par_node);
+int GetLeftBranchFile(const char *f_name, tree_node_t *parent_node);
+int GetRightBranchFile(const char *f_name, tree_node_t *parent_node);
 
 tree_node_t *CreateNode(elem_tree_t val) {  
 
