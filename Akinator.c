@@ -54,7 +54,7 @@ run_mode_t ParseArgv(const char *argv_str) {
     }
     argv_str--;
     if (*argv_str == '\0') {
-        RET_GOT_ODD_FLAG("-----...");
+        RET_GOT_ODD_FLAG("-----...", );
     }
     if (*argv_str != 'a' && *argv_str != 'l') {
         RET_GOT_ODD_FLAG("--...-%c", , *argv_str);

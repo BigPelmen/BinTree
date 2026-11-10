@@ -14,6 +14,8 @@
     #define V_ERRS(...)
 #endif
 
+#define DEF_TREE_TYPE char * 
+
 #ifdef DEF_TREE_TYPE
     typedef DEF_TREE_TYPE elem_tree_t;
 #else
@@ -56,16 +58,19 @@ typedef enum {
     ADD_FILE = 1 << 1,
 } stat_tree_t;
 
-#define MAX_STR_SIZE 1024
+#define MAX_STR_SIZE 1023
 #define GET_STR(___x___) #___x___
 #define FORMAT_STR(___size___) "%" GET_STR(___size___) "[^}]"
+// char *
 #ifndef DATA_FORMAT_OUT
-    #define DATA_FORMAT_OUT "%d"
+    #define DATA_FORMAT_OUT "%s"
 #endif
+// char *
 #ifndef DATA_FORMAT_IN
-    #define DATA_FORMAT_IN "%d"
+    #define DATA_FORMAT_IN FORMAT_STR(MAX_STR_SIZE)
 #endif
-#define DATA_DEFAULT_VAL 0
+// printf(DATA_FORMAT_IN)
+#define DATA_DEFAULT_VAL NULL
 #define LEFT_BRACE_SYM '{'
 #define RIGHT_BRACE_SYM '}'
 #define END_NODE_SYM '*'
@@ -101,6 +106,7 @@ FILE *GetCheckedFile(const char *f_name, const char *f_mode);
 void GraphBranch(FILE *fp, tree_node_t *node, const char *commentary);
 void BranchPrint(FILE *fp, tree_node_t *node, size_t rank);
 const char *CrPngGraphLine(const char *txt_path, const char *png_path);
+int StartGraphvizTxtCmd(const char *txt_path, const char *png_path);
 void ClearBranchNoUseIt(tree_node_t **node);
 int DestroyBranch(tree_node_t **node);
 tree_node_t *CreateNode(elem_tree_t val);
@@ -165,7 +171,8 @@ tree_node_t *CreateNode(elem_tree_t val) {
         return NULL;
     }
     new_node->parent = NULL;
-    new_node->data = val;
+    // char *
+    new_node->data = val ? strdup(val) : NULL;
     new_node->left_node = NULL;
     new_node->right_node = NULL;
     return new_node;
@@ -176,8 +183,14 @@ int NodeLinkLeft(tree_node_t *parent_node, tree_node_t *new_node) {
 
     if (new_node != NULL) {
         new_node->parent = parent_node;
-        if (parent_node->left_node) {
-            return NodeChangeVal(parent_node->left_node, new_node->data);
+        if (parent_node->left_node != NULL) {
+            DestroyBranch(&(parent_node->left_node));
+            // if (new_node->left_node != NULL || new_node->right_node != NULL) {
+            //     DestroyBranch(&(parent_node->left_node));
+            // }
+            // else {
+            //     return NodeChangeVal(parent_node->left_node, new_node->data);
+            // }
         }
     }
     parent_node->left_node = new_node;
@@ -189,8 +202,9 @@ int NodeLinkRight(tree_node_t *parent_node, tree_node_t *new_node) {
 
     if (new_node != NULL) {
         new_node->parent = parent_node;
-        if (parent_node->right_node) {
-            return NodeChangeVal(parent_node->right_node, new_node->data);
+        if (parent_node->right_node != NULL) {
+            DestroyBranch(&(parent_node->right_node));
+            // return NodeChangeVal(parent_node->right_node, new_node->data);
         }
     }
     parent_node->right_node = new_node;
@@ -200,7 +214,11 @@ int NodeLinkRight(tree_node_t *parent_node, tree_node_t *new_node) {
 int NodeChangeVal(tree_node_t *node, elem_tree_t new_val) {
     assert(node);
 
-    node->data = new_val;
+    // char *
+    if (node->data != NULL) {  
+        free(node->data);
+    }
+    node->data = new_val ? strdup(new_val) : DATA_DEFAULT_VAL;
     return errno;
 }
 
@@ -220,13 +238,18 @@ void ClearBranchNoUseIt(tree_node_t **node) {
     if ((*node)->right_node) {
         ClearBranchNoUseIt(&((*node)->right_node));
     }
+    // char *
+    if ((*node)->data != NULL) {
+        printf("%s\n", (*node)->data);
+        free((*node)->data);   
+    }
     FREE((*node), sizeof(tree_node_t));
 }
 
 int DestroyBranch(tree_node_t **node) {
     assert(node);
     assert(*node);
-
+    printf("FKOJFF\n");
     if ((*node)->parent) {
         if ((*node)->parent->left_node == *node) {
             (*node)->parent->left_node = NULL;
@@ -335,7 +358,6 @@ bool CheckIfNullNode(const char *str) {
     assert(str);
 
     while (isspace(*str) && *str != '\0') {
-        
         str++;
     }
     if (*str == END_NODE_SYM) {
@@ -343,7 +365,6 @@ bool CheckIfNullNode(const char *str) {
         while (isspace(*str) && *str != '\0') {
             str++;
         }
-
         if (*str == '\0' || *str == RIGHT_BRACE_SYM) {
             return true;
         }
@@ -356,13 +377,11 @@ read_node_info_t GetNodeVal(FILE *fp, elem_tree_t *arg) {
     assert(fp);
     assert(arg);
 
-    
     char str[MAX_STR_SIZE] = {};
     int sym = '\0';
     size_t i = 0;
     while ((sym = fgetc(fp)) != RIGHT_BRACE_SYM && sym != LEFT_BRACE_SYM && i < MAX_STR_SIZE - 1 && sym != EOF) {
         str[i++] = sym;
-        
     }
     if (sym != EOF) {
         ungetc(sym, fp);
@@ -371,9 +390,21 @@ read_node_info_t GetNodeVal(FILE *fp, elem_tree_t *arg) {
         return NODE_IS_NULL;
     }
     // printf("<%s>\n", str);
-    if (arg && sscanf(str, DATA_FORMAT_IN, arg) == 1) {
+    // char *
+    char *ptr = (char *)calloc(MAX_STR_SIZE + 1, sizeof(char));
+    if (ptr == NULL) {
+        return NODE_LOST_VAL;
+    }
+    if (arg && sscanf(str, DATA_FORMAT_IN, ptr) == 1) {
+        ptr = (elem_tree_t)realloc(ptr, strlen(ptr) + 1);
+        if (ptr == NULL) {
+            return NODE_LOST_VAL;
+        }
+        printf("<%s>\n", ptr);
+        *arg = ptr;
         return NODE_HAS_VAL;
     }
+    free(ptr);
     V_ERRS(fprintf(stderr, "SSCANF FAILED IN file on %s\n", str);)
     return NODE_LOST_VAL;
 }
@@ -437,6 +468,9 @@ int GetLeftBranchFile(const char *f_name, tree_node_t *parent_node) {
     assert(f_name);
     assert(parent_node);
 
+    if (parent_node->left_node != NULL) {
+        DestroyBranch(&(parent_node->left_node));
+    }
     GET_BRANCH(f_name, parent_node->left_node, parent_node, errno);
     return errno;
 }
@@ -445,6 +479,9 @@ int GetRightBranchFile(const char *f_name, tree_node_t *parent_node) {
     assert(f_name);
     assert(parent_node);
 
+    if (parent_node->right_node != NULL) {
+        DestroyBranch(&(parent_node->right_node));
+    }
     GET_BRANCH(f_name, parent_node->right_node, parent_node, errno);
     return errno;
 }
@@ -475,4 +512,20 @@ const char *CrPngGraphLine(const char *txt_path, const char *png_path) {
     }
     snprintf(cmd_line, CMD_EXTRA_SYMBOLS_AMOUNT, "dot \"%s\" -Tpng  -o \"%s\"", txt_path, png_path);
     return cmd_line;
+}
+
+int StartGraphvizTxtCmd(const char *txt_path, const char *png_path) {
+    assert(txt_path);
+    assert(png_path);
+
+    char *tmp_ptr = (char *)CrPngGraphLine(txt_path, png_path);
+    if (tmp_ptr == NULL) {
+        V_ERRS(fprintf(stderr, "Did not manage to construct .dot file by %s and %s file-pathes\n", txt_path, png_path);)
+        return errno;
+    }
+    int sys_status = 0;
+    system(tmp_ptr);
+    sys_status = errno;
+    free(tmp_ptr);
+    return sys_status;
 }
