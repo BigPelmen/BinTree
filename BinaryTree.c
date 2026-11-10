@@ -73,6 +73,9 @@ typedef enum {
 #define CMD_EXTRA_SYMBOLS_AMOUNT 128
 #define ORIENTATION_VER "TB"
 #define ORIENTATION_HOR "LR"
+#ifndef NODE_COLOR
+    #define NODE_COLOR "#a70000"
+#endif
 #ifndef NODESEP_VAL
     #define NODESEP_VAL 0.6
 #endif
@@ -258,7 +261,7 @@ FILE *GetCheckedFile(const char *f_name, const char *f_mode) {
                 LABEL_FONT "\";\n", ___commentary___, FONT_SIZE); \
         } \
         fprintf(___stream___, "rankdir=%s;\n", ORIENTATION_VER); \
-        fprintf(fp, "node [shape=" NODE_SHAPE "];\n"); \
+        fprintf(fp, "node [shape=" NODE_SHAPE ", color=\"" NODE_COLOR "\", penwidth=2.5];\n"); \
     } while(0)
 void GraphBranch(FILE *fp, tree_node_t *node, const char *commentary) {
     assert(fp);
