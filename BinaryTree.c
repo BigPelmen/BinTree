@@ -185,6 +185,7 @@ int NodeLinkLeft(tree_node_t *parent_node, tree_node_t *new_node) {
         new_node->parent = parent_node;
         if (parent_node->left_node != NULL) {
             DestroyBranch(&(parent_node->left_node));
+            
             // if (new_node->left_node != NULL || new_node->right_node != NULL) {
             //     DestroyBranch(&(parent_node->left_node));
             // }
@@ -232,16 +233,18 @@ void ClearBranchNoUseIt(tree_node_t **node) {
     assert(node);
     assert(*node);
 
+    
     if ((*node)->left_node) {
         ClearBranchNoUseIt(&((*node)->left_node));
     }
     if ((*node)->right_node) {
         ClearBranchNoUseIt(&((*node)->right_node));
     }
+    
     // char *
     if ((*node)->data != NULL) {
-        printf("%s\n", (*node)->data);
-        free((*node)->data);   
+        // printf("<%s>\n", (*node)->data);
+        free((*node)->data);  
     }
     FREE((*node), sizeof(tree_node_t));
 }
@@ -249,16 +252,23 @@ void ClearBranchNoUseIt(tree_node_t **node) {
 int DestroyBranch(tree_node_t **node) {
     assert(node);
     assert(*node);
-    printf("FKOJFF\n");
-    if ((*node)->parent) {
-        if ((*node)->parent->left_node == *node) {
-            (*node)->parent->left_node = NULL;
+
+    tree_node_t *tmp_node = (*node);
+    if (tmp_node->parent) {
+        if (tmp_node->parent->left_node == *node) {
+            tmp_node->parent->left_node = NULL;
+            // Тут *node стал NULL - почему?
         }
-        if ((*node)->parent->right_node == *node) {
-            (*node)->parent->right_node = NULL;
+        
+        else {
+            if (tmp_node->parent->right_node == *node) {
+                tmp_node->parent->right_node = NULL;
+            }
         }
+        
     }
-    ClearBranchNoUseIt(node);
+    ClearBranchNoUseIt(&tmp_node);
+    (*node) = NULL;
     return errno;
 }
 
@@ -335,6 +345,7 @@ void PreorderBranchPrint(FILE *fp, tree_node_t *node) {
     assert(fp);
     assert(node);
 
+    // printf("data: %s\n", node->data);
     fprintf(fp, "%c " DATA_FORMAT_OUT " ", LEFT_BRACE_SYM, node->data);
     IF_HOLLOW_SON(fp, node->left_node);
     IF_HOLLOW_SON(fp, node->right_node);
@@ -437,11 +448,12 @@ tree_node_t *GetNodesFromFile(FILE *fp, tree_node_t *par_node) {
         ungetc(sym, fp);
         return NULL;
     }
-    elem_tree_t val = DATA_DEFAULT_VAL;
-    tree_node_t *cur_node = NULL;
-    read_node_info_t node_info = GetNodeVal(fp, &val);
+    elem_tree_t buf_val = DATA_DEFAULT_VAL;
+    read_node_info_t node_info = GetNodeVal(fp, &buf_val);
+    tree_node_t *cur_node = CreateNode(buf_val);
+    free(buf_val), buf_val = NULL;
     RET_IF_END_NODE(node_info, fp);
-    if ((cur_node = CreateNode(val))) {
+    if (cur_node != NULL) {
         cur_node->parent = par_node;
         cur_node->left_node = GetNodesFromFile(fp, cur_node);
         cur_node->right_node = GetNodesFromFile(fp, cur_node);
@@ -490,11 +502,16 @@ int GetRightBranchFile(const char *f_name, tree_node_t *parent_node) {
 tree_node_t *GetRootBranchFile(const char *f_name) {
     assert(f_name);
 
-    tree_node_t *root_node = (tree_node_t *)calloc(1, sizeof(tree_node_t));
+    // tree_node_t *root_node = (tree_node_t *)calloc(1, sizeof(tree_node_t));
+    // if (root_node == NULL) {
+    //     return NULL;
+    // }
+    tree_node_t *root_node = NULL;
+    GET_BRANCH(f_name, root_node, ROOT_NODE_NO_ASSERT_PTR, NULL);
     if (root_node == NULL) {
+        V_ERRS(fprintf(stderr, "Bad root node got from %s file\n", f_name);)
         return NULL;
     }
-    GET_BRANCH(f_name, root_node, ROOT_NODE_NO_ASSERT_PTR, NULL);
     root_node->parent = NULL;
     return root_node;
 }
@@ -510,7 +527,7 @@ const char *CrPngGraphLine(const char *txt_path, const char *png_path) {
     if (cmd_line == NULL) {
         return NULL;
     }
-    snprintf(cmd_line, CMD_EXTRA_SYMBOLS_AMOUNT, "dot \"%s\" -Tpng  -o \"%s\"", txt_path, png_path);
+    snprintf(cmd_line, full_size, "dot \"%s\" -Tpng  -o \"%s\"", txt_path, png_path);
     return cmd_line;
 }
 
