@@ -6,6 +6,14 @@
 #include <ctype.h>
 #include <stdarg.h>
 
+#define CUMMING_DUMP
+
+#ifdef CUMMING_DUMP
+    #define CUM_ON(...) __VA_ARGS__
+#else
+    #define CUM_ON(...)
+#endif
+
 #define VERBOSE_ERRORS
 
 #ifdef VERBOSE_ERRORS
@@ -30,10 +38,12 @@
 //     elem_tree_t data;
 // } tree_node_t;
 
-typedef struct zzz_tree_node_struct {
-    struct zzz_tree_node_struct *parent;
-    struct zzz_tree_node_struct *left_node;
-    struct zzz_tree_node_struct *right_node;
+// typedef struct {void *parent; void *left_node; void *right_node; elem_tree_t data} tree_node_t;
+
+typedef struct tree_node_t {
+    tree_node_t *parent;
+    tree_node_t *left_node;
+    tree_node_t *right_node;
     elem_tree_t data;
 } tree_node_t;
 
@@ -58,6 +68,12 @@ typedef enum {
     ADD_FILE = 1 << 1,
 } stat_tree_t;
 
+typedef enum {
+    ENODE_OK,
+    ENODE_CALLOC,
+    ENODE_BRANCH_FILE_R,
+} bin_node_err_t;
+
 #define MAX_STR_SIZE 1023
 #define GET_STR(___x___) #___x___
 #define FORMAT_STR(___size___) "%" GET_STR(___size___) "[^}]"
@@ -81,6 +97,12 @@ typedef enum {
 #ifndef NODE_COLOR
     #define NODE_COLOR "#a70000"
 #endif
+#ifndef NODE_FILL_COLOR
+    #define NODE_FILL_COLOR "#ff5142"
+#endif
+#ifndef NODE_FONT_SIZE
+    #define NODE_FONT_SIZE 25
+#endif
 #ifndef NODESEP_VAL
     #define NODESEP_VAL 0.6
 #endif
@@ -102,6 +124,12 @@ static const char DFLT_TXT_NAME[] = "MyTxt.txt";
 
 #define CLOSE_BRACE(fp) fprintf(fp, "%c\n", RIGHT_BRACE_SYM)
 
+#define FREE(___ptr___, ___bytes_amount___) do { \
+    if (___ptr___) { \
+        memset(___ptr___, POISON_BYTE, ___bytes_amount___); \
+        free(___ptr___), ___ptr___ = NULL; \
+    } } while(0)
+
 FILE *GetCheckedFile(const char *f_name, const char *f_mode);
 void GraphBranch(FILE *fp, tree_node_t *node, const char *commentary);
 void BranchPrint(FILE *fp, tree_node_t *node, size_t rank);
@@ -119,8 +147,8 @@ bool CheckIfNullNode(const char *str);
 read_node_info_t GetNodeVal(FILE *fp, elem_tree_t *arg);
 void SkipCloseBrace(FILE *fp);
 tree_node_t *GetNodesFromFile(FILE *fp, tree_node_t *par_node);
-int GetLeftBranchFile(const char *f_name, tree_node_t *parent_node);
-int GetRightBranchFile(const char *f_name, tree_node_t *parent_node);
+bin_node_err_t GetLeftBranchFile(const char *f_name, tree_node_t *parent_node);
+bin_node_err_t GetRightBranchFile(const char *f_name, tree_node_t *parent_node);
 tree_node_t *GetRootBranchFile(const char *f_name);
 int TreeStat(full_tree_t *tree_ptr, tree_node_t *root_node);
 size_t CountNodesBranch(tree_node_t *node);
@@ -139,21 +167,8 @@ int TreeStat(full_tree_t *tree_ptr, tree_node_t *root_node) {
     if (tree_ptr->nodes == NULL) {
         return errno;
     }
-    
     return errno;
-    // if (storage_stats == ADD_NOTHING) {
-    //     return errno;
-    // }
-    // va_list ap;
-    // va_start(ap, storage_stats);
 }
-
-// size_t AddNodesTree(tree_node_t **arr, tree_node_t *root_node) {
-//     assert(arr);
-//     assert(root_node);
-
-    
-// }
 
 #define SIDE_COUNTER(___side___) ((___side___ != NULL) ? CountNodesBranch(___side___) : 0)
 size_t CountNodesBranch(tree_node_t *node) {
@@ -185,13 +200,6 @@ int NodeLinkLeft(tree_node_t *parent_node, tree_node_t *new_node) {
         new_node->parent = parent_node;
         if (parent_node->left_node != NULL) {
             DestroyBranch(&(parent_node->left_node));
-            
-            // if (new_node->left_node != NULL || new_node->right_node != NULL) {
-            //     DestroyBranch(&(parent_node->left_node));
-            // }
-            // else {
-            //     return NodeChangeVal(parent_node->left_node, new_node->data);
-            // }
         }
     }
     parent_node->left_node = new_node;
@@ -205,7 +213,6 @@ int NodeLinkRight(tree_node_t *parent_node, tree_node_t *new_node) {
         new_node->parent = parent_node;
         if (parent_node->right_node != NULL) {
             DestroyBranch(&(parent_node->right_node));
-            // return NodeChangeVal(parent_node->right_node, new_node->data);
         }
     }
     parent_node->right_node = new_node;
@@ -223,12 +230,6 @@ int NodeChangeVal(tree_node_t *node, elem_tree_t new_val) {
     return errno;
 }
 
-#define FREE(___ptr___, ___bytes_amount___) do { \
-    if (___ptr___) { \
-        memset(___ptr___, POISON_BYTE, ___bytes_amount___); \
-        free(___ptr___), ___ptr___ = NULL; \
-    } } while(0)
-
 void ClearBranchNoUseIt(tree_node_t **node) {
     assert(node);
     assert(*node);
@@ -243,7 +244,6 @@ void ClearBranchNoUseIt(tree_node_t **node) {
     
     // char *
     if ((*node)->data != NULL) {
-        // printf("<%s>\n", (*node)->data);
         free((*node)->data);  
     }
     FREE((*node), sizeof(tree_node_t));
@@ -257,15 +257,12 @@ int DestroyBranch(tree_node_t **node) {
     if (tmp_node->parent) {
         if (tmp_node->parent->left_node == *node) {
             tmp_node->parent->left_node = NULL;
-            // Тут *node стал NULL - почему?
         }
-        
         else {
             if (tmp_node->parent->right_node == *node) {
                 tmp_node->parent->right_node = NULL;
             }
         }
-        
     }
     ClearBranchNoUseIt(&tmp_node);
     (*node) = NULL;
@@ -285,26 +282,44 @@ FILE *GetCheckedFile(const char *f_name, const char *f_mode) {
     return fp;
 }
 
-#define SET_GLOBAL_SETTINGS(___stream___, ___commentary___) do { \
-        fprintf(___stream___, "digraph G {\n"); \
-        fprintf(___stream___, "nodesep=%lg;\n", NODESEP_VAL); \
-        fprintf(___stream___, "splines=" SPLINES_TYPE ";\n"); \
-        if (strlen(___commentary___)) { \
-            fprintf(___stream___, "label=\"%s\"; labelloc=\"t\"; fontsize=%d; fontname=\"" \
-                LABEL_FONT "\";\n", ___commentary___, FONT_SIZE); \
-        } \
-        fprintf(___stream___, "rankdir=%s;\n", ORIENTATION_VER); \
-        fprintf(fp, "node [shape=" NODE_SHAPE ", color=\"" NODE_COLOR "\", penwidth=2.5];\n"); \
-    } while(0)
+void SetGlobalSettings(FILE *fp, const char *commentary) {
+    assert(fp);
+    assert(commentary);
+
+    fprintf(fp, "digraph G {\n");
+    fprintf(fp, "nodesep=%lg;\n", NODESEP_VAL);
+    fprintf(fp, "splines=" SPLINES_TYPE ";\n");
+    if (strlen(commentary)) {
+        fprintf(fp, "label=\"%s\"; labelloc=\"t\"; fontsize=%d; fontname=\""
+            LABEL_FONT "\";\n", commentary, FONT_SIZE);
+    }
+    fprintf(fp, "rankdir=%s;\n", ORIENTATION_VER);
+    fprintf(fp, "node [shape=" NODE_SHAPE ", color=\"" NODE_COLOR "\", penwidth=5.0, "
+        "style=filled, fillcolor=\"" NODE_FILL_COLOR "\", fontsize=%d, fontname=\"Helvetica-Bold\"];\n", NODE_FONT_SIZE);
+}
+/*
+// #define SET_GLOBAL_SETTINGS(___stream___, ___commentary___) do { \
+//         fprintf(___stream___, "digraph G {\n"); \
+//         fprintf(___stream___, "nodesep=%lg;\n", NODESEP_VAL); \
+//         fprintf(___stream___, "splines=" SPLINES_TYPE ";\n"); \
+//         if (strlen(___commentary___)) { \
+//             fprintf(___stream___, "label=\"%s\"; labelloc=\"t\"; fontsize=%d; fontname=\"" \
+//                 LABEL_FONT "\";\n", ___commentary___, FONT_SIZE); \
+//         } \
+//         fprintf(___stream___, "rankdir=%s;\n", ORIENTATION_VER); \
+//         fprintf(fp, "node [shape=" NODE_SHAPE ", color=\"" NODE_COLOR "\", penwidth=5.0, " \
+//             "style=filled, fillcolor=\"" NODE_FILL_COLOR "\", fontsize=%d, fontname=\"Helvetica-Bold\"];\n", NODE_FONT_SIZE); \
+//     } while(0) */
 void GraphBranch(FILE *fp, tree_node_t *node, const char *commentary) {
     assert(fp);
     assert(node);
 
-    SET_GLOBAL_SETTINGS(fp, commentary);
+    // SET_GLOBAL_SETTINGS(fp, commentary);
+    SetGlobalSettings(fp, commentary);
     BranchPrint(fp, node, 1);
     CLOSE_BRACE(fp);
 }
-#undef SET_GLOBAL_SETTINGS
+// #undef SET_GLOBAL_SETTINGS
 
 size_t GetBranchDepth(tree_node_t *node) {
     if (node == NULL) {
@@ -316,42 +331,62 @@ size_t GetBranchDepth(tree_node_t *node) {
 }
 
 // void PrintFrameWork()
-
-#define RECURSIVE_PRINT(___son_node___, ___parent_side___) do { \
-    if (___son_node___) { \
-        fprintf(fp, "son%p:" ___parent_side___ " -> son%p:parent:n [weight=1];\n", node, ___son_node___); \
-        BranchPrint(fp, ___son_node___, rank + 1); \
-    } } while(0)
+/*
+// #define RECURSIVE_PRINT(___son_node___, ___parent_side___) do { \
+//     if (___son_node___) { \
+//         fprintf(fp, "son%p:" ___parent_side___ " -> son%p:parent:n [weight=1, penwidth=2.0];\n", node, ___son_node___); \
+//         BranchPrint(fp, ___son_node___, rank + 1); \
+//     } } while(0)*/
 void BranchPrint(FILE *fp, tree_node_t *node, size_t rank) {
     assert(fp);
     assert(node);
 
-    fprintf(fp, "son%p [label=\"{<parent> parent = %p | data = " DATA_FORMAT_OUT " | {<left> left = %p | <right> right = %p}}\"];\n", 
-        node, node->parent, node->data, node->left_node, node->right_node);
+    fprintf(fp, "son%p [label=\"{" CUM_ON("<parent> parent = %p | data = ") 
+        DATA_FORMAT_OUT CUM_ON(" | {<left> left = %p | <right> right = %p}") "}\"];\n", 
+        node, CUM_ON(node->parent,) node->data CUM_ON(, node->left_node, node->right_node));
     fprintf(fp, "subgraph level_%llu { { rank=same; son%p; } }\n", rank, node);
-    RECURSIVE_PRINT(node->left_node, "left:sw");
-    RECURSIVE_PRINT(node->right_node, "right:se");
+    if (node->left_node) {
+        fprintf(fp, "son%p:left:sw -> son%p:parent:n [weight=1, penwidth=2.0];\n", node, node->left_node);
+        BranchPrint(fp, node->left_node, rank + 1);
+    }
+    if (node->right_node) {
+        fprintf(fp, "son%p:right:se -> son%p:parent:n [weight=1, penwidth=2.0];\n", node, node->right_node);
+        BranchPrint(fp, node->right_node, rank + 1);
+    }
+    // RECURSIVE_PRINT(node->left_node, "left:sw");
+    // RECURSIVE_PRINT(node->right_node, "right:se");
 }
-#undef RECURSIVE_PRINT
-
-#define IF_HOLLOW_SON(___fp___, ___son___) do { \
-    if (___son___ == NULL) { \
-        fprintf(___fp___, "%c %c %c ", LEFT_BRACE_SYM, END_NODE_SYM, RIGHT_BRACE_SYM); \
-    } \
-    else { \
-        PreorderBranchPrint(___fp___, ___son___); \
-    } } while(0)
+// #undef RECURSIVE_PRINT
+/*
+// #define IF_HOLLOW_SON(___fp___, ___son___) do { \
+//     if (___son___ == NULL) { \
+//         fprintf(___fp___, "%c %c %c ", LEFT_BRACE_SYM, END_NODE_SYM, RIGHT_BRACE_SYM); \
+//     } \
+//     else { \
+//         PreorderBranchPrint(___fp___, ___son___); \
+//     } } while(0)*/
 void PreorderBranchPrint(FILE *fp, tree_node_t *node) {
     assert(fp);
     assert(node);
 
-    // printf("data: %s\n", node->data);
-    fprintf(fp, "%c " DATA_FORMAT_OUT " ", LEFT_BRACE_SYM, node->data);
-    IF_HOLLOW_SON(fp, node->left_node);
-    IF_HOLLOW_SON(fp, node->right_node);
+    fprintf(fp, "%c" DATA_FORMAT_OUT, LEFT_BRACE_SYM, node->data);
+    if (node->left_node == NULL) {
+        fprintf(fp, "%c %c %c ", LEFT_BRACE_SYM, END_NODE_SYM, RIGHT_BRACE_SYM);
+    }
+    else {
+        PreorderBranchPrint(fp, node->left_node);
+    }
+    if (node->right_node == NULL) {
+        fprintf(fp, "%c %c %c ", LEFT_BRACE_SYM, END_NODE_SYM, RIGHT_BRACE_SYM);
+    }
+    else {
+        PreorderBranchPrint(fp, node->right_node);
+    }
+    // IF_HOLLOW_SON(fp, node->left_node);
+    // IF_HOLLOW_SON(fp, node->right_node);
     fprintf(fp, "%c ", RIGHT_BRACE_SYM);
 }
-#undef IF_HOLLOW_SON
+// #undef IF_HOLLOW_SON
 
 void SkipFileSpaces(FILE *fp) {
     assert(fp);
@@ -384,34 +419,40 @@ bool CheckIfNullNode(const char *str) {
     return false;
 }
 
+// ...
+void CopyNodeData(char *data_str, FILE *fp) {
+    assert(data_str);
+    assert(fp);
+
+    int sym = '\0';
+    size_t i = 0;
+    while ((sym = fgetc(fp)) != RIGHT_BRACE_SYM && sym != LEFT_BRACE_SYM && i < MAX_STR_SIZE - 1 && sym != EOF) {
+        data_str[i++] = sym;
+    }
+    if (sym != EOF) {
+        ungetc(sym, fp);
+    }
+}
+
 read_node_info_t GetNodeVal(FILE *fp, elem_tree_t *arg) {
     assert(fp);
     assert(arg);
 
     char str[MAX_STR_SIZE] = {};
-    int sym = '\0';
-    size_t i = 0;
-    while ((sym = fgetc(fp)) != RIGHT_BRACE_SYM && sym != LEFT_BRACE_SYM && i < MAX_STR_SIZE - 1 && sym != EOF) {
-        str[i++] = sym;
-    }
-    if (sym != EOF) {
-        ungetc(sym, fp);
-    }
+    CopyNodeData(str, fp);
     if (CheckIfNullNode(str)) {
         return NODE_IS_NULL;
     }
-    // printf("<%s>\n", str);
     // char *
     char *ptr = (char *)calloc(MAX_STR_SIZE + 1, sizeof(char));
     if (ptr == NULL) {
         return NODE_LOST_VAL;
     }
-    if (arg && sscanf(str, DATA_FORMAT_IN, ptr) == 1) {
+    if (sscanf(str, DATA_FORMAT_IN, ptr) == 1) {
         ptr = (elem_tree_t)realloc(ptr, strlen(ptr) + 1);
         if (ptr == NULL) {
             return NODE_LOST_VAL;
         }
-        printf("<%s>\n", ptr);
         *arg = ptr;
         return NODE_HAS_VAL;
     }
@@ -430,11 +471,12 @@ void SkipCloseBrace(FILE *fp) {
     }
 }
 
-#define RET_IF_END_NODE(___node_info___, ___fp___) do { \
-    if (___node_info___ == NODE_IS_NULL) { \
-        SkipCloseBrace(___fp___); \
-        return NULL; \
-    } } while(0);
+/*
+// #define RET_IF_END_NODE(___node_info___, ___fp___) do { \
+//     if (___node_info___ == NODE_IS_NULL) { \
+//         SkipCloseBrace(___fp___); \
+//         return NULL; \
+//     } } while(0);*/
 tree_node_t *GetNodesFromFile(FILE *fp, tree_node_t *par_node) {
     assert(fp);
     assert(par_node);
@@ -452,7 +494,11 @@ tree_node_t *GetNodesFromFile(FILE *fp, tree_node_t *par_node) {
     read_node_info_t node_info = GetNodeVal(fp, &buf_val);
     tree_node_t *cur_node = CreateNode(buf_val);
     free(buf_val), buf_val = NULL;
-    RET_IF_END_NODE(node_info, fp);
+    if (node_info == NODE_IS_NULL) {
+        SkipCloseBrace(fp);
+        return NULL;
+    }
+    // RET_IF_END_NODE(node_info, fp);
     if (cur_node != NULL) {
         cur_node->parent = par_node;
         cur_node->left_node = GetNodesFromFile(fp, cur_node);
@@ -467,56 +513,75 @@ tree_node_t *GetNodesFromFile(FILE *fp, tree_node_t *par_node) {
 }
 #undef RET_IF_END_NODE
 
-#define GET_BRANCH(___f_name___, ___son___, ___parent___, ___err_ret___) do { \
-        FILE *fp = GetCheckedFile(___f_name___, "r"); \
-        if (fp == NULL) { \
-            V_ERRS(fprintf(stderr, "File %s was not opened in \"r\" mode\n", ___f_name___);) \
-            return ___err_ret___; \
-        } \
-        ___son___ = GetNodesFromFile(fp, ___parent___); \
-        fclose(fp); \
-    } while(0)
-int GetLeftBranchFile(const char *f_name, tree_node_t *parent_node) {
+// void GetOneBranch(const char *f_name, tree_node_t *son, tree_node_t *parent, void *err)
+/*
+// #define GET_BRANCH(___f_name___, ___son___, ___parent___, ___err_ret___) do { \
+//         FILE *fp = GetCheckedFile(___f_name___, "r"); \
+//         if (fp == NULL) { \
+//             V_ERRS(fprintf(stderr, "File %s was not opened in \"r\" mode\n", ___f_name___);) \
+//             return ___err_ret___; \
+//         } \
+//         ___son___ = GetNodesFromFile(fp, ___parent___); \
+//         fclose(fp); \
+//     } while(0)*/
+bin_node_err_t GetLeftBranchFile(const char *f_name, tree_node_t *parent_node) {
     assert(f_name);
     assert(parent_node);
 
     if (parent_node->left_node != NULL) {
         DestroyBranch(&(parent_node->left_node));
     }
-    GET_BRANCH(f_name, parent_node->left_node, parent_node, errno);
-    return errno;
+    FILE *fp = GetCheckedFile(f_name, "r");
+    if (fp == NULL) {
+        V_ERRS(fprintf(stderr, "File %s was not opened in \"r\" mode\n", f_name);) \
+        return ENODE_BRANCH_FILE_R;
+    }
+    parent_node->left_node = GetNodesFromFile(fp, parent_node);
+    fclose(fp);
+    // GET_BRANCH(f_name, parent_node->left_node, parent_node, errno);
+    return ENODE_OK;
 }
 
-int GetRightBranchFile(const char *f_name, tree_node_t *parent_node) {
+bin_node_err_t GetRightBranchFile(const char *f_name, tree_node_t *parent_node) {
     assert(f_name);
     assert(parent_node);
 
     if (parent_node->right_node != NULL) {
         DestroyBranch(&(parent_node->right_node));
     }
-    GET_BRANCH(f_name, parent_node->right_node, parent_node, errno);
-    return errno;
+    FILE *fp = GetCheckedFile(f_name, "r");
+    if (fp == NULL) {
+        V_ERRS(fprintf(stderr, "File %s was not opened in \"r\" mode\n", f_name);) \
+        return ENODE_BRANCH_FILE_R;
+    }
+    parent_node->right_node = GetNodesFromFile(fp, parent_node);
+    fclose(fp);
+    // GET_BRANCH(f_name, parent_node->right_node, parent_node, errno);
+    return ENODE_OK;
 }
 
 #define ROOT_NODE_NO_ASSERT_PTR (tree_node_t *)1
 tree_node_t *GetRootBranchFile(const char *f_name) {
     assert(f_name);
 
-    // tree_node_t *root_node = (tree_node_t *)calloc(1, sizeof(tree_node_t));
-    // if (root_node == NULL) {
-    //     return NULL;
-    // }
     tree_node_t *root_node = NULL;
-    GET_BRANCH(f_name, root_node, ROOT_NODE_NO_ASSERT_PTR, NULL);
+    FILE *fp = GetCheckedFile(f_name, "r");
+    if (fp == NULL) {
+        V_ERRS(fprintf(stderr, "File %s was not opened in \"r\" mode\n", f_name);) \
+        return NULL;
+    }
+    root_node = GetNodesFromFile(fp, ROOT_NODE_NO_ASSERT_PTR);
+    fclose(fp);
+    // GET_BRANCH(f_name, root_node, ROOT_NODE_NO_ASSERT_PTR, NULL);
     if (root_node == NULL) {
         V_ERRS(fprintf(stderr, "Bad root node got from %s file\n", f_name);)
-        return NULL;
+        return NULL; // ...
     }
     root_node->parent = NULL;
     return root_node;
 }
 #undef ROOT_NODE_NO_ASSERT_PTR
-#undef GET_BRANCH
+// #undef GET_BRANCH
 
 const char *CrPngGraphLine(const char *txt_path, const char *png_path) {
     assert(txt_path);

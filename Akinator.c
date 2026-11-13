@@ -38,6 +38,7 @@ int RunAkinator(tree_node_t *root_node);
 tree_node_t *AskQuestion(tree_node_t *cur_node);
 bool AskIfRightAnswer(tree_node_t *cur_node);
 int GetYesOrNo(void);
+void SkipLineStdin(void);
 tree_node_t *FixTheAnswer(tree_node_t *fix_node);
 int AskUserIfRigth(void);
 void SkipFileSpaces(FILE *stream);
@@ -72,10 +73,8 @@ int RunAkinator(tree_node_t *root_node) {
         return errno;
     }
     if (FixTheAnswer(cur_node) != NULL) {
-        
         FILE *dump_strg = GetCheckedFile("Preorder.txt", "w");
         PreorderBranchPrint(dump_strg, root_node);
-        
         fclose(dump_strg);
     }
     return errno;
@@ -87,6 +86,13 @@ int RunAkinator(tree_node_t *root_node) {
         ___func_name___(fix_node->parent, new_question_node); \
         fix_node = NULL; \
     } } while(0)
+#define CHECK_FGETS(___ans___) do { \
+        if (fgets(___ans___, MAX_STR_SIZE - 1, stdin) == NULL) { \
+            free(___ans___); \
+            return NULL; \
+        } \
+        ___ans___[strlen(___ans___) - 1] = '\0'; \
+    } while(0)
 tree_node_t *FixTheAnswer(tree_node_t *fix_node) {
     assert(fix_node);
 
@@ -96,31 +102,21 @@ tree_node_t *FixTheAnswer(tree_node_t *fix_node) {
         return NULL;
     }
     fprintf(stdout, "Please enter your question so that the game could guess this stuff next time:\n");
-    if (fgets(answer, MAX_STR_SIZE - 1, stdin) == NULL) {
-        free(answer);
-        return NULL;
-    }
+    CHECK_FGETS(answer);
     tree_node_t *new_question_node = CreateNode(answer);
     NodeLinkRight(new_question_node, CreateNode(fix_node->data));
     fprintf(stdout, "Now please say the game the answer for this question describing it correctly:\n");
-    if (fgets(answer, MAX_STR_SIZE - 1, stdin) == NULL) {
-        free(answer);
-        return NULL;
-    }
+    CHECK_FGETS(answer);
     NodeLinkLeft(new_question_node, CreateNode(answer));
-    
     if (fix_node->parent) {
         TRY_ALLIGN_SON(fix_node->parent->left_node, NodeLinkLeft);
-        printf("in %p\n", fix_node);
-        // FIXME fixnode->parent было убито 0xAAAAAAAAAAAAAAA
         TRY_ALLIGN_SON(fix_node->parent->right_node, NodeLinkRight);
     }
-    
     free(answer);
-
     return new_question_node;
 }
 #undef TRY_ALLIGN_SON
+#undef CHECK_FGETS
 
 tree_node_t *AskQuestion(tree_node_t *cur_node) {
     assert(cur_node);
@@ -155,10 +151,12 @@ int GetYesOrNo() {
     }
     if (sym == '\n') {
         fprintf(stdout, "Please enter not an empty line\n");
+        SkipLineStdin();
         return UNKNOWN_ANSWER_SYM;
     }
     if (tolower(sym) != NO_ANSWER_SYM && tolower(sym) != YES_ANSWER_SYM) {
         fprintf(stdout, "Please enter \"y\" or \"n\"\n");
+        SkipLineStdin();
         return UNKNOWN_ANSWER_SYM;
     }
     int tmp_res = tolower(sym);
@@ -169,6 +167,7 @@ int GetYesOrNo() {
         return tmp_res;
     }
     fprintf(stdout, "Please enter \"y\" or \"n\"\n");
+    SkipLineStdin();
     return UNKNOWN_ANSWER_SYM;
 }
 
@@ -178,6 +177,12 @@ int AskUserIfRigth() {
         sym = GetYesOrNo();
     } while(sym == UNKNOWN_ANSWER_SYM);
     return sym;
+}
+
+void SkipLineStdin() {
+    while (getchar() != '\n') {
+        ;
+    }
 }
 
 #define RET_GOT_ODD_FLAG(___str___, ...) do { \
@@ -254,7 +259,10 @@ int RunShowDataBase(tree_node_t *root_node) {
         }; \
     } while(0)
 int main(int argc, char const *argv[]) {
+    // storage_tree_t akinator_st = {};
+    // akinator_st.bin_tree
     run_mode_t r_mode = PLAY_AKINATOR_MODE;
+    // const char *f_name = NULL;
     tree_node_t *root_n = GetRootBranchFile("Preorder.txt");
     SWITCH_MODE(r_mode, argc);
     SWITCH_RUN(r_mode, root_n);
