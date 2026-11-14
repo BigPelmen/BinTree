@@ -1,77 +1,105 @@
 digraph G {
-nodesep=0.5;
+nodesep=0.6;
 splines=spline;
+ranksep=0.75;
 rankdir=TB;
-node [shape=Mrecord];
-son000002696FC113C0 [label="{<parent> parent = 0000000000000000 | data = 50 | {<left> left = 000002696FC11270 | <right> right = 000002696FC112A0}}"];
-subgraph level_1 { { rank=same; son000002696FC113C0; } }
-son000002696FC113C0:left:sw -> son000002696FC11270:parent:n [weight=1];
-son000002696FC11270 [label="{<parent> parent = 000002696FC113C0 | data = 20 | {<left> left = 000002696FC11120 | <right> right = 000002696FC11150}}"];
-subgraph level_2 { { rank=same; son000002696FC11270; } }
-son000002696FC11270:left:sw -> son000002696FC11120:parent:n [weight=1];
-son000002696FC11120 [label="{<parent> parent = 000002696FC11270 | data = 10 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_3 { { rank=same; son000002696FC11120; } }
-son000002696FC11270:right:se -> son000002696FC11150:parent:n [weight=1];
-son000002696FC11150 [label="{<parent> parent = 000002696FC11270 | data = 30 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_3 { { rank=same; son000002696FC11150; } }
-son000002696FC113C0:right:se -> son000002696FC112A0:parent:n [weight=1];
-son000002696FC112A0 [label="{<parent> parent = 000002696FC113C0 | data = 60 | {<left> left = 000002696FC113F0 | <right> right = 000002696FC11420}}"];
-subgraph level_2 { { rank=same; son000002696FC112A0; } }
-son000002696FC112A0:left:sw -> son000002696FC113F0:parent:n [weight=1];
-son000002696FC113F0 [label="{<parent> parent = 000002696FC112A0 | data = 55 | {<left> left = 000002696FC11450 | <right> right = 000002696FC11390}}"];
-subgraph level_3 { { rank=same; son000002696FC113F0; } }
-son000002696FC113F0:left:sw -> son000002696FC11450:parent:n [weight=1];
-son000002696FC11450 [label="{<parent> parent = 000002696FC113F0 | data = 50 | {<left> left = 000002696FC112D0 | <right> right = 000002696FC11300}}"];
-subgraph level_4 { { rank=same; son000002696FC11450; } }
-son000002696FC11450:left:sw -> son000002696FC112D0:parent:n [weight=1];
-son000002696FC112D0 [label="{<parent> parent = 000002696FC11450 | data = 20 | {<left> left = 000002696FC11480 | <right> right = 000002696FC11180}}"];
-subgraph level_5 { { rank=same; son000002696FC112D0; } }
-son000002696FC112D0:left:sw -> son000002696FC11480:parent:n [weight=1];
-son000002696FC11480 [label="{<parent> parent = 000002696FC112D0 | data = 10 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_6 { { rank=same; son000002696FC11480; } }
-son000002696FC112D0:right:se -> son000002696FC11180:parent:n [weight=1];
-son000002696FC11180 [label="{<parent> parent = 000002696FC112D0 | data = 30 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_6 { { rank=same; son000002696FC11180; } }
-son000002696FC11450:right:se -> son000002696FC11300:parent:n [weight=1];
-son000002696FC11300 [label="{<parent> parent = 000002696FC11450 | data = 60 | {<left> left = 000002696FC111E0 | <right> right = 000002696FC11210}}"];
-subgraph level_5 { { rank=same; son000002696FC11300; } }
-son000002696FC11300:left:sw -> son000002696FC111E0:parent:n [weight=1];
-son000002696FC111E0 [label="{<parent> parent = 000002696FC11300 | data = 55 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_6 { { rank=same; son000002696FC111E0; } }
-son000002696FC11300:right:se -> son000002696FC11210:parent:n [weight=1];
-son000002696FC11210 [label="{<parent> parent = 000002696FC11300 | data = 120 | {<left> left = 000002696FC11360 | <right> right = 0000000000000000}}"];
-subgraph level_6 { { rank=same; son000002696FC11210; } }
-son000002696FC11210:left:sw -> son000002696FC11360:parent:n [weight=1];
-son000002696FC11360 [label="{<parent> parent = 000002696FC11210 | data = 150 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_7 { { rank=same; son000002696FC11360; } }
-son000002696FC113F0:right:se -> son000002696FC11390:parent:n [weight=1];
-son000002696FC11390 [label="{<parent> parent = 000002696FC113F0 | data = 50 | {<left> left = 000002696FC11240 | <right> right = 000002696FC13870}}"];
-subgraph level_4 { { rank=same; son000002696FC11390; } }
-son000002696FC11390:left:sw -> son000002696FC11240:parent:n [weight=1];
-son000002696FC11240 [label="{<parent> parent = 000002696FC11390 | data = 20 | {<left> left = 000002696FC11330 | <right> right = 000002696FC13750}}"];
-subgraph level_5 { { rank=same; son000002696FC11240; } }
-son000002696FC11240:left:sw -> son000002696FC11330:parent:n [weight=1];
-son000002696FC11330 [label="{<parent> parent = 000002696FC11240 | data = 10 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_6 { { rank=same; son000002696FC11330; } }
-son000002696FC11240:right:se -> son000002696FC13750:parent:n [weight=1];
-son000002696FC13750 [label="{<parent> parent = 000002696FC11240 | data = 30 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_6 { { rank=same; son000002696FC13750; } }
-son000002696FC11390:right:se -> son000002696FC13870:parent:n [weight=1];
-son000002696FC13870 [label="{<parent> parent = 000002696FC11390 | data = 60 | {<left> left = 000002696FC13450 | <right> right = 000002696FC138A0}}"];
-subgraph level_5 { { rank=same; son000002696FC13870; } }
-son000002696FC13870:left:sw -> son000002696FC13450:parent:n [weight=1];
-son000002696FC13450 [label="{<parent> parent = 000002696FC13870 | data = 55 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_6 { { rank=same; son000002696FC13450; } }
-son000002696FC13870:right:se -> son000002696FC138A0:parent:n [weight=1];
-son000002696FC138A0 [label="{<parent> parent = 000002696FC13870 | data = 120 | {<left> left = 000002696FC135D0 | <right> right = 0000000000000000}}"];
-subgraph level_6 { { rank=same; son000002696FC138A0; } }
-son000002696FC138A0:left:sw -> son000002696FC135D0:parent:n [weight=1];
-son000002696FC135D0 [label="{<parent> parent = 000002696FC138A0 | data = 150 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_7 { { rank=same; son000002696FC135D0; } }
-son000002696FC112A0:right:se -> son000002696FC11420:parent:n [weight=1];
-son000002696FC11420 [label="{<parent> parent = 000002696FC112A0 | data = 120 | {<left> left = 000002696FC111B0 | <right> right = 0000000000000000}}"];
-subgraph level_3 { { rank=same; son000002696FC11420; } }
-son000002696FC11420:left:sw -> son000002696FC111B0:parent:n [weight=1];
-son000002696FC111B0 [label="{<parent> parent = 000002696FC11420 | data = 150 | {<left> left = 0000000000000000 | <right> right = 0000000000000000}}"];
-subgraph level_4 { { rank=same; son000002696FC111B0; } }
+node [shape=Mrecord, color="#a70000", penwidth=5.0, style=filled, fillcolor="#ff5142", fontsize=25, fontname="Helvetica-Bold"];
+son00000243E7040E40 [label="{Is an animal}"];
+subgraph level_1 { { rank=same; son00000243E7040E40; } }
+son00000243E7040E40:sw -> son00000243E7040F00:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7040F00 [label="{Is a human}"];
+subgraph level_2 { { rank=same; son00000243E7040F00; } }
+son00000243E7040F00:sw -> son00000243E7040C90:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7040C90 [label="{Is a physisist}"];
+subgraph level_3 { { rank=same; son00000243E7040C90; } }
+son00000243E7040C90:sw -> son00000243E7040DB0:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7040DB0 [label="{Connects to students via telegram}"];
+subgraph level_4 { { rank=same; son00000243E7040DB0; } }
+son00000243E7040DB0:sw -> son00000243E7040CC0:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7040CC0 [label="{Babincsev}", fillcolor="#e860a9"];
+subgraph level_5 { { rank=same; son00000243E7040CC0; } }
+son00000243E7040DB0:se -> son00000243E7040E70:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7040E70 [label="{Is working in laboratory}"];
+subgraph level_5 { { rank=same; son00000243E7040E70; } }
+son00000243E7040E70:sw -> son00000243E7040F30:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7040F30 [label="{Provides extra seminars}"];
+subgraph level_6 { { rank=same; son00000243E7040F30; } }
+son00000243E7040F30:sw -> son00000243E7040EA0:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7040EA0 [label="{Chivilyov}", fillcolor="#e860a9"];
+subgraph level_7 { { rank=same; son00000243E7040EA0; } }
+son00000243E7040F30:se -> son00000243E7040F90:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7040F90 [label="{Veryovochkin}", fillcolor="#e860a9"];
+subgraph level_7 { { rank=same; son00000243E7040F90; } }
+son00000243E7040E70:se -> son00000243E7040D80:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7040D80 [label="{Ovchinkin}", fillcolor="#e860a9"];
+subgraph level_6 { { rank=same; son00000243E7040D80; } }
+son00000243E7040C90:se -> son00000243E70433F0:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E70433F0 [label="{Have 'sun' and 'star' marks on lectures}"];
+subgraph level_4 { { rank=same; son00000243E70433F0; } }
+son00000243E70433F0:sw -> son00000243E7043720:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7043720 [label="{Podlipskaya}", fillcolor="#e860a9"];
+subgraph level_5 { { rank=same; son00000243E7043720; } }
+son00000243E70433F0:se -> son00000243E7043780:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7043780 [label="{Has FPMI and FRCT simultaneously}"];
+subgraph level_5 { { rank=same; son00000243E7043780; } }
+son00000243E7043780:sw -> son00000243E7043150:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7043150 [label="{Ilyinskiy}", fillcolor="#e860a9"];
+subgraph level_6 { { rank=same; son00000243E7043150; } }
+son00000243E7043780:se -> son00000243E70437B0:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E70437B0 [label="{Is a student}"];
+subgraph level_6 { { rank=same; son00000243E70437B0; } }
+son00000243E70437B0:sw -> son00000243E70432A0:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E70432A0 [label="{Michael Daskal}", fillcolor="#e860a9"];
+subgraph level_7 { { rank=same; son00000243E70432A0; } }
+son00000243E70437B0:se -> son00000243E7043600:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7043600 [label="{Znamenskaya}", fillcolor="#e860a9"];
+subgraph level_7 { { rank=same; son00000243E7043600; } }
+son00000243E7040F00:se -> son00000243E7043300:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7043300 [label="{Is fucker-half-human}"];
+subgraph level_3 { { rank=same; son00000243E7043300; } }
+son00000243E7043300:sw -> son00000243E7043180:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7043180 [label="{Umnov Jr.}", fillcolor="#e860a9"];
+subgraph level_4 { { rank=same; son00000243E7043180; } }
+son00000243E7043300:se -> son00000243E7043750:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7043750 [label="{Has 6 limbs}"];
+subgraph level_4 { { rank=same; son00000243E7043750; } }
+son00000243E7043750:sw -> son00000243E7044400:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7044400 [label="{Buzzes}"];
+subgraph level_5 { { rank=same; son00000243E7044400; } }
+son00000243E7044400:sw -> son00000243E7044430:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7044430 [label="{A bumblebee}", fillcolor="#e860a9"];
+subgraph level_6 { { rank=same; son00000243E7044430; } }
+son00000243E7044400:se -> son00000243E70446D0:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E70446D0 [label="{A cockroach}", fillcolor="#e860a9"];
+subgraph level_6 { { rank=same; son00000243E70446D0; } }
+son00000243E7043750:se -> son00000243E7043390:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7043390 [label="{A cat}", fillcolor="#e860a9"];
+subgraph level_5 { { rank=same; son00000243E7043390; } }
+son00000243E7040E40:se -> son00000243E7043210:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7043210 [label="{Is located in the dorm}"];
+subgraph level_2 { { rank=same; son00000243E7043210; } }
+son00000243E7043210:sw -> son00000243E7043060:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7043060 [label="{Creates light}"];
+subgraph level_3 { { rank=same; son00000243E7043060; } }
+son00000243E7043060:sw -> son00000243E70430C0:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E70430C0 [label="{A lamp}", fillcolor="#e860a9"];
+subgraph level_4 { { rank=same; son00000243E70430C0; } }
+son00000243E7043060:se -> son00000243E7043570:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7043570 [label="{Has mustache}"];
+subgraph level_4 { { rank=same; son00000243E7043570; } }
+son00000243E7043570:sw -> son00000243E7043450:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E7043450 [label="{Poltorashka '1,5'}", fillcolor="#e860a9"];
+subgraph level_5 { { rank=same; son00000243E7043450; } }
+son00000243E7043570:se -> son00000243E70435A0:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E70435A0 [label="{Inside the jar}"];
+subgraph level_5 { { rank=same; son00000243E70435A0; } }
+son00000243E70435A0:sw -> son00000243E70435D0:n [weight=1, penwidth=2.5, color="#1e8c00"];
+son00000243E70435D0 [label="{Beer}", fillcolor="#e860a9"];
+subgraph level_6 { { rank=same; son00000243E70435D0; } }
+son00000243E70435A0:se -> son00000243E7044790:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E7044790 [label="{The piano}", fillcolor="#e860a9"];
+subgraph level_6 { { rank=same; son00000243E7044790; } }
+son00000243E7043210:se -> son00000243E70447C0:n [weight=1, penwidth=2.5, color="#00538b"];
+son00000243E70447C0 [label="{A mirror}", fillcolor="#e860a9"];
+subgraph level_3 { { rank=same; son00000243E70447C0; } }
 }
