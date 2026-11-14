@@ -6,8 +6,6 @@
 #include <ctype.h>
 #include <stdarg.h>
 
-#define CUMMING_DUMP
-
 #ifdef CUMMING_DUMP
     #define CUM_ON(...) __VA_ARGS__
 #else
@@ -30,15 +28,6 @@
     #define DEFAULT_STACK_TYPE int
     typedef DEFAULT_STACK_TYPE elem_tree_t;
 #endif // DEF_TREE_TYPE
-
-// typedef struct tree_node {
-//     struct tree_node *parent;
-//     tree_node_t *left_node;
-//     tree_node_t *right_node;
-//     elem_tree_t data;
-// } tree_node_t;
-
-// typedef struct {void *parent; void *left_node; void *right_node; elem_tree_t data} tree_node_t;
 
 typedef struct tree_node_t {
     tree_node_t *parent;
@@ -85,7 +74,6 @@ typedef enum {
 #ifndef DATA_FORMAT_IN
     #define DATA_FORMAT_IN FORMAT_STR(MAX_STR_SIZE)
 #endif
-// printf(DATA_FORMAT_IN)
 #define DATA_DEFAULT_VAL NULL
 #define LEFT_BRACE_SYM '{'
 #define RIGHT_BRACE_SYM '}'
@@ -97,14 +85,26 @@ typedef enum {
 #ifndef NODE_COLOR
     #define NODE_COLOR "#a70000"
 #endif
+#ifndef NODE_END_FILL_COLOR
+    #define NODE_END_FILL_COLOR "#e860a9"
+#endif
 #ifndef NODE_FILL_COLOR
     #define NODE_FILL_COLOR "#ff5142"
+#endif
+#ifndef NODE_CONNECTION_COLOR_YES
+    #define NODE_CONNECTION_COLOR_YES "#1e8c00"
+#endif
+#ifndef NODE_CONNECTION_COLOR_NO
+    #define NODE_CONNECTION_COLOR_NO "#00538b"
 #endif
 #ifndef NODE_FONT_SIZE
     #define NODE_FONT_SIZE 25
 #endif
 #ifndef NODESEP_VAL
     #define NODESEP_VAL 0.6
+#endif
+#ifndef RANKSEP_VAL
+    #define RANKSEP_VAL 0.75
 #endif
 #ifndef SPLINES_TYPE
     #define SPLINES_TYPE "spline"
@@ -133,6 +133,7 @@ static const char DFLT_TXT_NAME[] = "MyTxt.txt";
 FILE *GetCheckedFile(const char *f_name, const char *f_mode);
 void GraphBranch(FILE *fp, tree_node_t *node, const char *commentary);
 void BranchPrint(FILE *fp, tree_node_t *node, size_t rank);
+void AdjustPrintOneNode(FILE *fp, tree_node_t *node, size_t rank);
 const char *CrPngGraphLine(const char *txt_path, const char *png_path);
 int StartGraphvizTxtCmd(const char *txt_path, const char *png_path);
 void ClearBranchNoUseIt(tree_node_t **node);
@@ -171,13 +172,12 @@ int TreeStat(full_tree_t *tree_ptr, tree_node_t *root_node) {
     return errno;
 }
 
-#define SIDE_COUNTER(___side___) ((___side___ != NULL) ? CountNodesBranch(___side___) : 0)
 size_t CountNodesBranch(tree_node_t *node) {
     assert(node);
 
-    return 1 + SIDE_COUNTER(node->left_node) + SIDE_COUNTER(node->right_node);
+    return 1 + ((node->left_node != NULL) ? CountNodesBranch(node->left_node) : 0) + 
+        ((node->right_node != NULL) ? CountNodesBranch(node->right_node) : 0);
 }
-#undef SIDE_COUNTER
 
 tree_node_t *CreateNode(elem_tree_t val) {  
 
@@ -290,6 +290,7 @@ void SetGlobalSettings(FILE *fp, const char *commentary) {
     fprintf(fp, "digraph G {\n");
     fprintf(fp, "nodesep=%lg;\n", NODESEP_VAL);
     fprintf(fp, "splines=" SPLINES_TYPE ";\n");
+    fprintf(fp, "ranksep=%lg;\n", RANKSEP_VAL);
     if (strlen(commentary)) {
         fprintf(fp, "label=\"%s\"; labelloc=\"t\"; fontsize=%d; fontname=\""
             LABEL_FONT "\";\n", commentary, FONT_SIZE);
@@ -321,18 +322,34 @@ void BranchPrint(FILE *fp, tree_node_t *node, size_t rank) {
     assert(fp);
     assert(node);
 
-    fprintf(fp, "son%p [label=\"{" CUM_ON("<parent> parent = %p | data = ") 
-        DATA_FORMAT_OUT CUM_ON(" | {<left> left = %p | <right> right = %p}") "}\"];\n", 
-        node, CUM_ON(node->parent,) node->data CUM_ON(, node->left_node, node->right_node));
-    fprintf(fp, "subgraph level_%llu { { rank=same; son%p; } }\n", rank, node);
+    AdjustPrintOneNode(fp, node, rank);
     if (node->left_node) {
-        fprintf(fp, "son%p:left:sw -> son%p:parent:n [weight=1, penwidth=2.0];\n", node, node->left_node);
+        fprintf(fp, "son%p:" CUM_ON("left:") "sw -> son%p:" CUM_ON("parent:") "n [weight=1, penwidth=2.5, color=\"" 
+            NODE_CONNECTION_COLOR_YES "\"];\n", node, node->left_node);
         BranchPrint(fp, node->left_node, rank + 1);
     }
     if (node->right_node) {
-        fprintf(fp, "son%p:right:se -> son%p:parent:n [weight=1, penwidth=2.0];\n", node, node->right_node);
+        fprintf(fp, "son%p:" CUM_ON("right:") "se -> son%p:" CUM_ON("parent:") "n [weight=1, penwidth=2.5, color=\"" 
+            NODE_CONNECTION_COLOR_NO "\"];\n", node, node->right_node);
         BranchPrint(fp, node->right_node, rank + 1);
     }
+}
+
+void AdjustPrintOneNode(FILE *fp, tree_node_t *node, size_t rank) {
+    assert(fp);
+    assert(node);
+
+    if (node->left_node == NULL && node->right_node == NULL) {
+        fprintf(fp, "son%p [label=\"{" CUM_ON("<parent> parent = %p | data = ") DATA_FORMAT_OUT 
+            CUM_ON(" | {<left> left = %p | <right> right = %p}") "}\", fillcolor=\"" NODE_END_FILL_COLOR "\"];\n", 
+            node, CUM_ON(node->parent,) node->data CUM_ON(, node->left_node, node->right_node));
+    }
+    else {
+        fprintf(fp, "son%p [label=\"{" CUM_ON("<parent> parent = %p | data = ") 
+            DATA_FORMAT_OUT CUM_ON(" | {<left> left = %p | <right> right = %p}") "}\"];\n", 
+            node, CUM_ON(node->parent,) node->data CUM_ON(, node->left_node, node->right_node));    
+    }
+    fprintf(fp, "subgraph level_%llu { { rank=same; son%p; } }\n", rank, node);
 }
 
 void PreorderBranchPrint(FILE *fp, tree_node_t *node) {
